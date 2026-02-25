@@ -1,73 +1,29 @@
-# React + TypeScript + Vite
+# 💻 SIDE TERMINAL : Advanced Data Ingestion System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sebuah sistem pengumpulan data interaktif berbasis web yang mendobrak desain form konvensional. Mengusung antarmuka *Cyberpunk / Hacker Terminal* dengan animasi *real-time*, aplikasi ini dirancang tidak hanya untuk estetika, tetapi juga fungsionalitas tingkat tinggi untuk manajemen dataset lokal.
 
-Currently, two official plugins are available:
+## 🚀 Fitur Superior (Hacker Edition)
+1. **Live Network Traffic & Marquee:** Animasi *real-time* yang menghasilkan log *traffic* IP dan Hexadesimal secara otomatis untuk imersi maksimal.
+2. **Instant Query Databank:** Fitur pencarian data (Live Search) yang langsung memfilter *database* saat *user* mengetik, tanpa perlu me-refresh halaman.
+3. **CSV Data Dump:** Kemampuan mengekspor seluruh *database* (atau data yang baru diinput) ke dalam format `.csv` utuh yang siap diolah menggunakan Python (Pandas) atau Excel.
+4. **Local Persistent Storage:** Data dijamin aman di memori browser (`localStorage`) dan tidak akan hilang meskipun tab ditutup.
+5. **Nuke Protocol (Purge DB):** Tombol eksekusi darurat untuk mengosongkan keseluruhan *database* lokal dalam satu klik dengan konfirmasi keamanan.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack & Modul
+- **Core Framework:** React 18 + TypeScript (via Vite)
+- **Styling:** Tailwind CSS (dengan Custom Keyframes Animation untuk efek Marquee)
+- **Data Export:** Vanilla JS `Blob API` & `URL.createObjectURL`
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🐛 Log Perbaikan Bug & Optimasi (Bug Tracking)
 
-## Expanding the ESLint configuration
+Sesuai standar operasional pengembangan perangkat lunak, berikut adalah dokumentasi *bug* kritis yang ditemukan selama fase *development* dan penyelesaiannya:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**[Bug] Memory Leak Akibat Animasi Network Traffic (Web Laggy/Lemot)**
+- **Deskripsi Masalah:** Setelah web dibiarkan terbuka selama lebih dari 5 menit, browser mulai terasa berat (*laggy*) dan penggunaan RAM meningkat drastis.
+- **Penyebab Utama:** Fitur *Live Network Traffic* menggunakan fungsi `setInterval` di dalam `useEffect` React untuk men-generate angka acak setiap 600ms. Namun, interval tersebut tidak dihentikan/dibersihkan (*unmounted*) saat komponen me-render ulang, sehingga ratusan proses interval berjalan bersamaan di belakang layar secara *infinite*.
+- **Penyelesaian (Fix):** Menambahkan *Cleanup Function* pada siklus hidup (lifecycle) `useEffect`. Memasukkan perintah `clearInterval(interval)` pada *return statement* agar interval lama dihancurkan sebelum interval baru dibuat.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+*Keterangan pada Git Commit:*
+> `fix: menambahkan cleanup function clearInterval pada useEffect network traffic untuk mencegah memory leak dan lag pada browser`

@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // =====================================================================
 const APP_CONFIG = {
   namaSistem: "SIDE TERMINAL",     
-  versi: "v5.0.0-ultimate-core",
+  versi: "v5.0.1-stable-core",
   koordinat: "LAT -0.9492° S, LON 100.3543° E (Padang, ID)", 
   userTerminal: "takerevenge@1120",      
 };
@@ -38,12 +38,11 @@ export default function App() {
   const [kataKunci, setKataKunci] = useState('');
   const [logSistem, setLogSistem] = useState<string[]>(['> SYSTEM BOOT SEQUENCE INITIATED...', '> SECURE UPLINK ESTABLISHED.']);
   
-  // STATE LOADING & FITUR BARU
   const [lagiLoading, setLagiLoading] = useState(false);
   const [lagiInjecting, setLagiInjecting] = useState(false); 
   const [idEdit, setIdEdit] = useState<string | null>(null);
-  const [isEncrypted, setIsEncrypted] = useState(false); // FITUR 1: Visual Encryption
-  const [isScanning, setIsScanning] = useState(false); // FITUR 3: System Scan
+  const [isEncrypted, setIsEncrypted] = useState(false); 
+  const [isScanning, setIsScanning] = useState(false); 
   const [integrityScore, setIntegrityScore] = useState(100);
 
   const [networkTraffic, setNetworkTraffic] = useState<string[]>([]);
@@ -68,7 +67,6 @@ export default function App() {
     setFormInput({ ...formInput, [e.target.name]: e.target.value });
   };
 
-  // FITUR 2: MULTI-FORMAT EXPORT (CSV & JSON)
   const downloadData = (format: 'csv' | 'json') => {
     if (dataLokal.length === 0) return alert("Database kosong!");
     
@@ -92,7 +90,6 @@ export default function App() {
     setLogSistem(prev => [...prev, `> SUKSES: Data di-export ke format .${format.toUpperCase()}`]);
   };
 
-  // FITUR 3: SYSTEM INTEGRITY SCAN
   const runSystemScan = () => {
     setIsScanning(true);
     setLogSistem(prev => [...prev, `> INITIATING DEEP SYSTEM SCAN...`, `> CHECKING DATA BLOCKS...`]);
@@ -117,12 +114,10 @@ export default function App() {
     
     setTimeout(() => {
       if (idEdit) {
-        // UPDATE (CRUD)
         setDataLokal(dataLokal.map(item => item.idLog === idEdit ? { ...item, ...formInput, waktuInput: new Date().toLocaleTimeString('id-ID', { hour12: false }) + ' (MODIFIED)' } : item));
         setLogSistem(prev => [...prev, `> DATA ${idEdit} SECURELY UPDATED.`]);
         setIdEdit(null);
       } else {
-        // CREATE (CRUD)
         setDataLokal([{ ...formInput, idLog: `SYS-${Math.floor(Math.random() * 90000) + 10000}`, waktuInput: new Date().toLocaleTimeString('id-ID', { hour12: false }) }, ...dataLokal]);
         setLogSistem(prev => [...prev, `> NEW DATA RECORDED.`]);
       }
@@ -153,7 +148,6 @@ export default function App() {
   };
 
   const handleHapus = (id: string) => {
-    // DELETE (CRUD)
     setDataLokal(dataLokal.filter(item => item.idLog !== id));
     setLogSistem(prev => [...prev, `> PURGED: ${id}`]);
   };
@@ -171,17 +165,15 @@ export default function App() {
     item.idLog.toLowerCase().includes(kataKunci.toLowerCase())
   );
 
-  // Fungsi Pembantu Enkripsi Visual
   const maskText = (text: string) => isEncrypted ? text.replace(/[a-zA-Z0-9]/g, '*') : text;
 
+  // VARIABEL YANG ERROR SEBELUMNYA KITA PAKE DI SINI:
   const totalRoot = dataLokal.filter(d => d.tingkatAkses === 'Root').length;
   const totalAdmin = dataLokal.filter(d => d.tingkatAkses === 'Admin').length;
 
   return (
-    // PENGUBAHAN: h-screen dan flex flex-col untuk layout container utama agar tidak tumpah
     <div className={`h-screen bg-slate-950 font-mono ${activeTheme.text} flex flex-col selection:bg-slate-800 overflow-hidden relative transition-colors duration-500`}>
       
-      {/* CSS Animasi Hacker & Glitch */}
       <style>
         {`
           @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
@@ -207,7 +199,6 @@ export default function App() {
         `}
       </style>
 
-      {/* Cyberpunk Grid Background */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] z-0"></div>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.4)_50%)] bg-[length:100%_4px] z-50"></div>
       
@@ -227,7 +218,6 @@ export default function App() {
             <p className="text-xs tracking-[0.2em] opacity-80 uppercase">CORE V.5 ULTIMATE NETWORK // {APP_CONFIG.versi}</p>
           </div>
           
-          {/* THEME SWITCHER CYBERPUNK HUD */}
           <div className="flex flex-col items-end gap-2">
             <div className="text-[10px] uppercase tracking-widest opacity-60">UI_COLOR_SCHEME</div>
             <div className="flex gap-2">
@@ -245,9 +235,10 @@ export default function App() {
 
         <main className="max-w-7xl w-full mx-auto flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
           
-          {/* PANEL KIRI (FORM) */}
+          {/* PANEL KIRI (FORM & DIAGNOSTICS) */}
           <section className="w-full lg:w-[400px] shrink-0 flex flex-col gap-4 overflow-y-auto custom-scrollbar pr-2">
-            <div className={`bg-slate-950/80 backdrop-blur-md border p-5 flex-1 relative transition-all duration-500
+            
+            <div className={`bg-slate-950/80 backdrop-blur-md border p-5 relative transition-all duration-500
               ${idEdit ? 'border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.4)] bg-amber-950/20' : `${activeTheme.border} ${activeTheme.glow}`}`}>
               
               <div className={`text-xs mb-6 border-b ${idEdit ? 'border-amber-500/50' : activeTheme.border} pb-2 flex justify-between uppercase tracking-widest`}>
@@ -310,11 +301,18 @@ export default function App() {
               </form>
             </div>
 
-            {/* DIAGNOSTICS HUD DENGAN SCANNER */}
+            {/* MENGGUNAKAN VARIABEL NETWORK TRAFFIC AGAR TIDAK ERROR TS6133 */}
+            <div className={`bg-black/40 border ${activeTheme.border} p-3 text-[9px] tracking-widest opacity-60 h-24 overflow-hidden flex flex-col justify-end shrink-0`}>
+              {networkTraffic.map((traffic, i) => (
+                <div key={i} className="mb-0.5">{traffic}</div>
+              ))}
+            </div>
+
+            {/* MENGGUNAKAN VARIABEL TOTAL ROOT & ADMIN AGAR TIDAK ERROR TS6133 */}
             <div className={`bg-slate-950/80 border ${activeTheme.border} p-4 flex flex-col gap-3 backdrop-blur-md shrink-0`}>
               <div className="flex justify-between items-center border-b border-slate-800 pb-1 mb-1">
                 <span className="text-[10px] uppercase tracking-widest">SYSTEM_DIAGNOSTICS</span>
-                <button onClick={runSystemScan} disabled={isScanning} className="text-[9px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-white">
+                <button onClick={runSystemScan} disabled={isScanning} className="text-[9px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-white transition-colors">
                   {isScanning ? 'SCANNING...' : 'RUN SCAN'}
                 </button>
               </div>
@@ -322,11 +320,19 @@ export default function App() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex justify-between text-[9px] mb-1"><span>STORAGE</span> <span>{dataLokal.length}/999</span></div>
-                  <div className="h-1 bg-slate-900 w-full"><div className="h-full bg-white transition-all" style={{ width: `${Math.min((dataLokal.length/100)*100, 100)}%` }}></div></div>
+                  <div className="h-1 bg-slate-900 w-full"><div className="h-full bg-white transition-all" style={{ width: `${Math.min((dataLokal.length/999)*100, 100)}%` }}></div></div>
                 </div>
                 <div>
                   <div className="flex justify-between text-[9px] mb-1 text-cyan-400"><span>INTEGRITY</span> <span>{integrityScore}%</span></div>
                   <div className="h-1 bg-slate-900 w-full"><div className={`h-full ${integrityScore < 100 ? 'bg-orange-500' : 'bg-cyan-500'} transition-all`} style={{ width: `${integrityScore}%` }}></div></div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-[9px] mb-1 text-red-400"><span>ROOT_ACC</span> <span>{totalRoot}</span></div>
+                  <div className="h-1 bg-slate-900 w-full"><div className="h-full bg-red-500 transition-all" style={{ width: `${dataLokal.length === 0 ? 0 : (totalRoot/dataLokal.length)*100}%` }}></div></div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-[9px] mb-1 text-orange-400"><span>ADMIN_ACC</span> <span>{totalAdmin}</span></div>
+                  <div className="h-1 bg-slate-900 w-full"><div className="h-full bg-orange-500 transition-all" style={{ width: `${dataLokal.length === 0 ? 0 : (totalAdmin/dataLokal.length)*100}%` }}></div></div>
                 </div>
               </div>
             </div>
@@ -360,7 +366,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* PENGUBAHAN: flex-1 dan overflow-y-auto memastikan list data bisa discroll secara independen tanpa memecah layout layar */}
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar pb-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {dataTampil.length === 0 ? (
@@ -373,7 +378,6 @@ export default function App() {
                     <div key={item.idLog} className={`bg-slate-950/60 backdrop-blur-sm border p-5 hover:border-slate-400 transition-all duration-300 relative group overflow-hidden 
                       ${idEdit === item.idLog ? 'border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)] bg-amber-950/30' : 'border-slate-800'}`}>
                       
-                      {/* Tanda Jelas Kalau Sedang Di-Edit */}
                       {idEdit === item.idLog && (
                         <div className="absolute inset-0 border-2 border-amber-500 animate-pulse pointer-events-none z-0"></div>
                       )}
@@ -382,7 +386,6 @@ export default function App() {
                         {item.idLog.split('-')[1]}
                       </div>
 
-                      {/* Tombol CRUD (Selalu muncul saat di-hover) */}
                       <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity bg-black/90 px-2 py-1 rounded backdrop-blur-md z-20 border border-slate-700">
                         <button onClick={() => mulaiEdit(item)} className="text-amber-400 hover:text-white font-bold text-[10px] tracking-widest bg-amber-900/30 px-2 py-0.5 rounded">[EDIT]</button>
                         <button onClick={() => handleHapus(item.idLog)} className="text-red-500 hover:text-white font-bold text-[10px] tracking-widest bg-red-900/30 px-2 py-0.5 rounded">[DEL]</button>
@@ -420,7 +423,6 @@ export default function App() {
         </main>
       </div>
 
-      {/* Floating System Logs Terminal */}
       <div className={`fixed bottom-4 left-4 w-72 bg-black/90 border ${activeTheme.border} p-3 text-[9px] tracking-widest opacity-80 backdrop-blur-md hidden lg:flex flex-col z-50`}>
         <div className="border-b border-slate-800 pb-1 mb-2 flex justify-between">
           <span>TERMINAL_OUTPUT</span>
